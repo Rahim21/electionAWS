@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Vote</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .carousel {
+            scroll-snap-type: x mandatory;
+            overflow-x: auto;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .carousel-item {
+            scroll-snap-align: center;
+            flex: 0 0 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .button-disabled {
+            background-color: #d1d5db; /* Grisé */
+            cursor: not-allowed;
+        }
+
+        .button-enabled {
+            background-color: #2563eb; /* Bleu */
+            cursor: pointer;
+        }
+
+        .candidate-selected {
+            background-color: #10b981; /* Vert */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- Toast -->
+    <div id="toast-container" class="fixed top-5 right-5 space-y-4 z-50"></div>
+
+    <!-- Container Principal -->
+    <main class="flex flex-col gap-4 p-6 min-h-screen">
+        <h2 class="text-2xl text-blue-700 font-bold text-left">Système de vote AWS</h2>
+        <!-- Sections Résultats et Formulaire côte à côte -->
+        <div class="flex flex-col md:flex-row justify-between gap-6">
+            <!-- Partie Résultats -->
+            <section class="md:w-1/3 bg-white p-4 rounded-lg shadow-lg overflow-hidden h-auto">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700">Résultats en Temps Réel</h2>
+                <div id="chartWrapper" class="relative">
+                    <canvas id="resultsChart"></canvas>
+                    <div id="noResultsMessage" class="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 rounded-lg hidden">
+                        <div class="text-center p-6 bg-white rounded-lg shadow-lg">
+                            <p class="text-xl font-semibold text-gray-700">Aucun candidat pour le moment</p>
+                            <p class="text-md text-gray-500">Il n'y a pas encore de candidats disponibles pour cette élection.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Séarateur -->
+                <div class="w-full border-t border-gray-400 my-8"></div>
+
+                <div class="bg-white p-4 mt-4">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Statistiques en Temps Réel</h3>
+                    <div class="space-y-4">
+                        <p class="text-lg">Nombre total de votes : <span id="voteCount" class="font-semibold text-blue-600">0</span></p>
+                        <p class="text-lg">Candidats en compétition : <span id="candidateCount" class="font-semibold text-blue-600">0</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Partie Candidats et Formulaire de Vote -->
+            <section class="md:w-2/3 bg-white p-4 rounded-lg shadow-lg">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Partie Candidats -->
+                    <div class="md:w-1/2 bg-white p-4 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Choisissez un <span style="color:#9745b7">Candidat</span> :</h3>
+                        <div id="candidates-list" class="max-h-64 overflow-y-auto space-y-4">
+                            <!-- Les candidats seront ajoutés ici -->
+                        </div>
+                    </div>
+
+                    <!-- Séparateur -->
+                    <div class="hidden md:block w-px bg-gray-300 my-4"></div>
+
+                    <!-- Partie de Vote -->
+                    <div class="md:w-1/2 bg-white p-4 rounded-lg shadow-lg flex flex-col space-y-4 max-h-[500px] overflow-y-auto">
+                        
+                        <p class="text-sm font-semibold text-gray-700">Reçevez votre droit de vote par mail</p>
+                        <!-- Premier Formulaire pour l'email et le bouton -->
+                        <form id="emailForm" class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-lg">Votre E-mail</label>
+                                <input type="email" id="email" class="w-full p-2 border rounded-lg" required />
+                            </div>
+                            <button type="button" id="getCodeBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg">Recevoir un code de vote</button>
+                        </form>
+
+                        <!-- Séarateur -->
+                        <div class="w-full border-t border-gray-800 my-4"></div>
+                        
+                        <p class="text-sm font-semibold text-gray-700">Selectionnez votre <span style="color:#9745b7">candidat</span> et Votez maintenant !</p>
+                        <!-- Deuxième Formulaire pour le code et le bouton de validation -->
+                        <form id="voteForm" class="space-y-4">
+                            <div>
+                                <label for="code" class="block text-lg">Code de Vote</label>
+                                <input type="text" id="code" class="w-full p-2 border rounded-lg" required />
+                            </div>
+                            <button type="button" id="voteBtn" class="w-full button-disabled text-white py-2 rounded-lg" disabled>Je valide mon vote !</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Footer avec dégradé -->
+                <footer class="mt-6 bg-gradient-to-r from-blue-600 to-red-600 p-4 text-white text-center rounded-b-lg">
+                    <div id="timer" class="font-bold text-lg">00:00:00</div>
+                </footer>
+            </section>
+        </div>
+
+        <!-- Section Carrousel en bas -->
+        <section class="w-full bg-white p-4 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-center text-gray-700">Pourquoi voter pour eux ?</h2>
+            <div id="carousel" class="carousel-container flex overflow-x-scroll space-x-4 py-2">
+                <!-- Les éléments du carrousel seront ajoutés dynamiquement -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>

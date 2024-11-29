@@ -1,0 +1,41 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Environment Variables
+.env
+
+# MacOS
+.DS_Store
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+
+# Build output
+/dist/
+.build/
+
+# Coverage directory used by testing tools like Jest
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Optional npm cache directory
+.npm
+
+# Optional Yarn cache directory
+.yarn
+
+# AWS specific files (optional, based on project setup)
+.aws-sam/
