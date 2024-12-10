@@ -27,6 +27,7 @@ ElectionAWS is a secure voting platform built with leveraging AWS services such 
 
 - [⚙️ Tech Stack](#tech-stack)
 - [🔋 Features](#features)
+- [🖼️ Preview](#preview)
 - [🚀 Getting Started](#getting-started)
 - [📜 Environment Variables](#environment-variables)
 - [🔗 Links](#links)
@@ -56,6 +57,12 @@ ElectionAWS leverages modern technologies to deliver a secure and efficient voti
   - Integrated with Boto3 for seamless AWS interactions.
 - **Scalability and reliability**:
   - Cloud-based architecture ensures consistent performance.
+
+## <a name="preview">🖼️ Preview</a>
+
+<div align="center">
+   <img src="https://i.ibb.co/vsGLsyN/election-AWS.png" alt="ElectionAWS Site Preview" width="100%" />
+</div>
 
 ## <a name="getting-started">🚀 Getting Started</a>
 
